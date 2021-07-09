@@ -47,7 +47,7 @@ public class MessageController {
         SendMessageRequest request = SendMessageRequest
                 .builder()
                 .message("1. INDOMIE REBUS | Rp3.000 | Garut 2. MIE SEDAP REBUS | Rp4.000 | Garut 3. POP MIE REBUS | Rp5.000 | Garut")
-                .number("081227023622")
+                .number("081915815742")
                 .build();
         return service.sendMessage(request);
     }
@@ -57,7 +57,7 @@ public class MessageController {
         SendMessageRequest request = SendMessageRequest
                 .builder()
                 .message("BERIKUT DETAIL TRANSAKSI ANDA. NOMOR: 1, NAMA: INDOMIE GORENG, PEMBAYARAN: COD, ALAMAT: JL.CIBADUY, TOTAL BIAYA: Rp60.000. Apakah anda yakin?")
-                .number("081227023622")
+                .number("081915815742")
                 .build();
         return service.sendMessage(request);
     }
@@ -67,25 +67,25 @@ public class MessageController {
         SendMessageRequest request = SendMessageRequest
                 .builder()
                 .message("TRANSAKSI ANDA TELAH TERKONFIRMASI. BARANG AKAN SEGERA DIKIRIM PENJUAL KEPADA ANDA. TERIMAKASIH")
-                .number("081227023622")
+                .number("081915815742")
                 .build();
 
         SendMessageRequest request2 = SendMessageRequest
                 .builder()
                 .message("UPDATE TRANSAKSI ID:221. BARANG SUDAH DIKIRIM TOKO KE EKSPEDISI")
-                .number("081227023622")
+                .number("081915815742")
                 .build();
 
         SendMessageRequest request3 = SendMessageRequest
                 .builder()
                 .message("KURIR COD SEDANG DALAM PERJALANAN KETEMPAT KAMU")
-                .number("081227023622")
+                .number("081915815742")
                 .build();
 
         SendMessageRequest request4 = SendMessageRequest
                 .builder()
                 .message("TRANSAKSI ANDA TELAH SELESAI. SEMOGA TRANSAKSI ANDA MENYENANGKAN")
-                .number("081227023622")
+                .number("081915815742")
                 .build();
         try {
             service.sendMessage(request);
@@ -94,11 +94,11 @@ public class MessageController {
             Thread.sleep(5 * 1000);
             service.sendMessage(request3);
             Thread.sleep(5 * 1000);
-            service.sendMessage(request4);
+
         } catch (Exception e){
             e.printStackTrace();
         }
-        return service.sendMessage(request);
+        return service.sendMessage(request4);
     }
 
     @PostMapping(value = "api/callback/transactions/details")
@@ -106,7 +106,7 @@ public class MessageController {
         SendMessageRequest request = SendMessageRequest
                 .builder()
                 .message("STATUS TRANSAKSI ANDA: KURIR SEDANG KETEMPATMU")
-                .number("081227023622")
+                .number("081915815742")
                 .build();
         return service.sendMessage(request);
     }

@@ -1,6 +1,8 @@
 package com.devcamp.groupone.sms.controller;
 
 import com.devcamp.groupone.sms.constant.ApiPath;
+import com.devcamp.groupone.sms.payload.request.SendMessageRequest;
+import com.devcamp.groupone.sms.service.MessageService;
 import lombok.val;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,6 +13,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.reactive.function.BodyInserter;
 import org.springframework.web.reactive.function.BodyInserters;
@@ -29,75 +32,83 @@ import java.util.List;
 
 @RestController
 public class MessageController {
-    private static final Logger logger = LoggerFactory.getLogger(MessageController.class);
 
     @Autowired
-    WebClient webClient;
+    private MessageService service;
 
     @GetMapping(value = "/api/send")
-    public String sendMessage() throws URISyntaxException {
-        MultiValueMap<String, String> bodyValues = new LinkedMultiValueMap<>();
-        bodyValues.add("phone_number", "081915815742");
-        bodyValues.add("message", "Tes smsgateway.me");
-        bodyValues.add("device_id", "125029");
-
-        List<MultiValueMap> data = new ArrayList<>();
-        data.add(bodyValues);
-        data.add(bodyValues);
-
-        String datas = "[\n" +
-                "  {\n" +
-                "    \"phone_number\": \"081915815742\",\n" +
-                "    \"message\": \"string\",\n" +
-                "    \"device_id\": 125029\n" +
-                "  }\n" +
-                "]";
-
-        String response =this.webClient
-                .post()
-                .uri(new URI("https://smsgateway.me/api/v4/message/send"))
-                .body(BodyInserters.fromObject(datas))
-                .header("Authorization", "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJhZG1pbiIsImlhdCI6MTYyNTg1NDkwNywiZXhwIjo0MTAyNDQ0ODAwLCJ1aWQiOjg5NDkyLCJyb2xlcyI6WyJST0xFX1VTRVIiXX0.DdexTqgCQHtnXrI2bQUcAdOxam_gFLPes59EEyU0z7g")
-                .header("Content-Type", "application/json")
-                .retrieve()
-                .bodyToMono(String.class)
-                .block();
-        return response;
+    public String sendMessage(@RequestBody SendMessageRequest request) throws URISyntaxException {
+        return service.sendMessage(request);
     }
 
-    @GetMapping(value = "/api/callback")
-    public String setCallback() throws URISyntaxException {
-        String datas  = "{\n" +
-                "  \"name\": \"Test Callback\",\n" +
-                "  \"event\": \"MESSAGE_RECEIVED\",\n" +
-                "  \"device_id\": 125029,\n" +
-                "  \"filter_type\": \"contains\",\n" +
-                "  \"filter\": \"beli\",\n" +
-                "  \"method\": \"http\",\n" +
-                "  \"action\": \"http://mywebsite/sms-gateway-me-hook\",\n" +
-                "  \"secret\": \"super-secret\"\n" +
-                "}";
-        String response =this.webClient
-                .post()
-                .uri(new URI("https://smsgateway.me/api/v4/callback"))
-                .body(BodyInserters.fromObject(datas))
-                .header("Authorization", "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJhZG1pbiIsImlhdCI6MTYyNTg1NDkwNywiZXhwIjo0MTAyNDQ0ODAwLCJ1aWQiOjg5NDkyLCJyb2xlcyI6WyJST0xFX1VTRVIiXX0.DdexTqgCQHtnXrI2bQUcAdOxam_gFLPes59EEyU0z7g")
-                .header("Content-Type", "application/json")
-                .retrieve()
-                .bodyToMono(String.class)
-                .block();
-        return response;
+
+    @PostMapping(value = "api/callback/products")
+    public String trxSearch(Object data) throws URISyntaxException {
+        SendMessageRequest request = SendMessageRequest
+                .builder()
+                .message("1. INDOMIE REBUS | Rp3.000 | Garut 2. MIE SEDAP REBUS | Rp4.000 | Garut 3. POP MIE REBUS | Rp5.000 | Garut")
+                .number("081227023622")
+                .build();
+        return service.sendMessage(request);
     }
 
-    @PostMapping(value = "api/callback/received")
-    public String getcallbackpost(Object data){
-        logger.info("post callback response: {}", String.valueOf(data));
-        return "sukses";
+    @PostMapping(value = "api/callback/transactions")
+    public String makeTrx(Object data) throws URISyntaxException {
+        SendMessageRequest request = SendMessageRequest
+                .builder()
+                .message("BERIKUT DETAIL TRANSAKSI ANDA. NOMOR: 1, NAMA: INDOMIE GORENG, PEMBAYARAN: COD, ALAMAT: JL.CIBADUY, TOTAL BIAYA: Rp60.000. Apakah anda yakin?")
+                .number("081227023622")
+                .build();
+        return service.sendMessage(request);
     }
 
-    @GetMapping(value = "api/callback/received")
-    public String getcallbackget(Object data){
-        logger.info("get call back response: {}", String.valueOf(data));
-        return "sukses";
+    @PostMapping(value = "api/callback/confirmations")
+    public String trxConfirmation(Object data) throws URISyntaxException {
+        SendMessageRequest request = SendMessageRequest
+                .builder()
+                .message("TRANSAKSI ANDA TELAH TERKONFIRMASI. BARANG AKAN SEGERA DIKIRIM PENJUAL KEPADA ANDA. TERIMAKASIH")
+                .number("081227023622")
+                .build();
+
+        SendMessageRequest request2 = SendMessageRequest
+                .builder()
+                .message("UPDATE TRANSAKSI ID:221. BARANG SUDAH DIKIRIM TOKO KE EKSPEDISI")
+                .number("081227023622")
+                .build();
+
+        SendMessageRequest request3 = SendMessageRequest
+                .builder()
+                .message("KURIR COD SEDANG DALAM PERJALANAN KETEMPAT KAMU")
+                .number("081227023622")
+                .build();
+
+        SendMessageRequest request4 = SendMessageRequest
+                .builder()
+                .message("TRANSAKSI ANDA TELAH SELESAI. SEMOGA TRANSAKSI ANDA MENYENANGKAN")
+                .number("081227023622")
+                .build();
+        try {
+            service.sendMessage(request);
+            Thread.sleep(5 * 1000);
+            service.sendMessage(request2);
+            Thread.sleep(5 * 1000);
+            service.sendMessage(request3);
+            Thread.sleep(5 * 1000);
+            service.sendMessage(request4);
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+        return service.sendMessage(request);
     }
+
+    @PostMapping(value = "api/callback/transactions/details")
+    public String trxDetail(Object data) throws URISyntaxException {
+        SendMessageRequest request = SendMessageRequest
+                .builder()
+                .message("STATUS TRANSAKSI ANDA: KURIR SEDANG KETEMPATMU")
+                .number("081227023622")
+                .build();
+        return service.sendMessage(request);
+    }
+
 }
